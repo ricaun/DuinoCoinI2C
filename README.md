@@ -32,7 +32,7 @@ After the job is done, the slave sends back the response to the master (Esp8266)
 
 ## Max Client/Slave
 
-The code supports 10 clients and can be change on the define:
+The code supports 10 clients and can be changed on the define:
 
 ```
 #define CLIENTS 10
