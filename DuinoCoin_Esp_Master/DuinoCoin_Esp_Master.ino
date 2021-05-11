@@ -19,14 +19,12 @@ const char* rigIdentifier = "ESP-I2C";  // Change this if you want a custom mine
 #endif
 
 #include <ArduinoOTA.h>
-#include <DuinoCoin.h>
 #include <StreamString.h>
 
 #define BLINK_SHARE_FOUND    1
 #define BLINK_SETUP_COMPLETE 2
 #define BLINK_CLIENT_CONNECT 3
 #define BLINK_RESET_DEVICE   5
-
 
 #if ESP8266
 #define LED_BUILTIN 2
@@ -102,7 +100,9 @@ void RestartESP(String msg) {
   Serial.println(msg);
   Serial.println("Resetting ESP...");
   blink(BLINK_RESET_DEVICE);
-  ESP.reset();
+  #if ESP8266
+    ESP.reset();
+  #endif
 }
 
 void setup() {

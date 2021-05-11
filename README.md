@@ -1,6 +1,6 @@
 # DuinoCoinI2C
 
-This project design to mine [Duino-Coin](https://github.com/revoxhere/duino-coin) using an Esp8266 as a master and Arduino as a slave. 
+This project design to mine [Duino-Coin](https://github.com/revoxhere/duino-coin) using an Esp8266/Esp32 as a master and Arduino as a slave. 
 
 Using the I2C communication to connect all the boards and make a scalable communication between the master and the slaves.
 
@@ -12,14 +12,14 @@ Using the I2C communication to connect all the boards and make a scalable commun
 
 ## Pinouts
 
-Connect the pins of the Esp8266 on the Arduino like the table below.
+Connect the pins of the Esp8266 or Esp32 on the Arduino like the table below.
 
-|| ESP8266 | Arduino |
-|:-:| :----: | :-----: |
-||3.3V | 5V |
-||GND | GND |
-|`SCL`|D1 (GPIO5) | A5 |
-|`SDA`|D2 (GPIO4) | A4 |
+|| ESP8266 | ESP32 | Arduino |
+|:-:| :----: | :----: | :-----: |
+||3.3V | 3.3V | 5V |
+||GND | GND | GND |
+|`SCL`|D1 (GPIO5) | GPIO22 | A5 |
+|`SDA`|D2 (GPIO4) | GPIO21 | A4 |
 
 # Library Dependency
 
@@ -35,11 +35,11 @@ All Slaves have the same code and should select the I2C Address automatically.
 
 The I2C Address on the Arduino is automatically updated when the board starts, if an Address already exists on the I2C bus the code finds another Address to use.
 
-# Esp8266
+# Esp8266/Esp32
 
 The master requests the job on the `DuinoCoin` server and sends the work to the slave (Arduino).
 
-After the job is done, the slave sends back the response to the master (Esp8266) and then sends back to the `DuinoCoin` server.
+After the job is done, the slave sends back the response to the master (Esp8266/Esp32) and then sends back to the `DuinoCoin` server.
 
 ## Max Client/Slave
 

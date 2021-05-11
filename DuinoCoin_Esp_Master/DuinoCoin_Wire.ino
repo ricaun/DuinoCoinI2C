@@ -6,8 +6,15 @@
 
 #include <Wire.h>
 
+#if ESP8266
 #define SDA 4 // D2 - A4 - GPIO4
 #define SCL 5 // D1 - A5 - GPIO5
+#endif
+
+#if ESP32
+#define SDA 21
+#define SCL 22
+#endif
 
 void wire_setup()
 {
