@@ -4,15 +4,9 @@ This project design to mine [Duino-Coin](https://github.com/revoxhere/duino-coin
 
 Using the I2C communication to connect all the boards and make a scalable communication between the master and the slaves.
 
-<a href="Resources/Fritzing">
-<img src="Resources/Fritzing/DuinoCoinI2C/DuinoCoinI2C.png" alt="DuinoCoinI2C" width="640px">
-</a>
-
-<h3>WARNING: Do not connect the USB of the Arduino, all the boards are powered by 3.3V.</h3>
-
 ## Pinouts
 
-Connect the pins of the Esp8266 or Esp32 on the Arduino like the table below.
+Connect the pins of the Esp8266 or Esp32 on the Arduino like the table/images below.
 
 || ESP8266 | ESP32 | Arduino |
 |:-:| :----: | :----: | :-----: |
@@ -20,6 +14,16 @@ Connect the pins of the Esp8266 or Esp32 on the Arduino like the table below.
 ||GND | GND | GND |
 |`SCL`|D1 (GPIO5) | GPIO22 | A5 |
 |`SDA`|D2 (GPIO4) | GPIO21 | A4 |
+
+<h3>WARNING: Do not connect the USB of the Arduino, all the boards are powered by 3.3V.</h3>
+
+### Esp8266 with one Arduino Nano.
+
+<img src="Resources/Fritzing/DuinoCoinI2C/DuinoCoinI2C_1xNano.png" alt="DuinoCoinI2C" width="50%">
+
+### Esp8266 with three Arduino Nano
+
+<img src="Resources/Fritzing/DuinoCoinI2C/DuinoCoinI2C_3xNano.png" alt="DuinoCoinI2C" width="50%">
 
 # Library Dependency
 
