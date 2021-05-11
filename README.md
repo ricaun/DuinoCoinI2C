@@ -10,6 +10,17 @@ Using the I2C communication to connect all the boards and make a scalable commun
 
 <h3>WARNING: Do not connect the USB of the Arduino, all the boards are powered by 3.3V.</h3>
 
+## Pinouts
+
+Connect the pins of the Esp8266 on the Arduino like the table below.
+
+|| ESP8266 | Arduino |
+|:-:| :----: | :-----: |
+||3.3V | 5V |
+||GND | GND |
+|`SCL`|D1 (GPIO5) | A5 |
+|`SDA`|D2 (GPIO4) | A4 |
+
 # Library Dependency
 
 * [DuinoCoin](https://github.com/ricaun/arduino-DuinoCoin) (Handle the `Ducos1a` hash work)
