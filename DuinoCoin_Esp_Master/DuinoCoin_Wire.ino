@@ -67,6 +67,7 @@ void Wire_send(byte address, String message)
 
 String wire_readLine(int address)
 {
+  wire_runEvery(0);
   char end = '\n';
   String str = "";
   boolean done = false;
@@ -84,7 +85,20 @@ String wire_readLine(int address)
       }
       str += c;
     }
+    if (wire_runEvery(2000)) break;
   }
   //str += end;
   return str;
+}
+
+boolean wire_runEvery(unsigned long interval)
+{
+  static unsigned long previousMillis = 0;
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousMillis >= interval)
+  {
+    previousMillis = currentMillis;
+    return true;
+  }
+  return false;
 }
