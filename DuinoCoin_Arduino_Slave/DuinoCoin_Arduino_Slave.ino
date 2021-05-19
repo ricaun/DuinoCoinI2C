@@ -13,7 +13,7 @@ void setup() {
 void loop() {
   if (DuinoCoin_loop())
   {
-    Serial.print("Job Done : ");
+    Serial.print(F("Job Done : "));
     Serial.print(DuinoCoin_response());
   }
   if (runEvery(250))

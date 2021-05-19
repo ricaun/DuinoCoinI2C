@@ -40,7 +40,7 @@ void DuinoCoin_setup()
   Wire.onReceive(receiveEvent);
   Wire.onRequest(requestEvent);
 
-  Serial.print("Wire Address: ");
+  Serial.print(F("Wire Address: "));
   Serial.println(i2c);
 }
 
