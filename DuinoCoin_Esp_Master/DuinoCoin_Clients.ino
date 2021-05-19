@@ -25,9 +25,11 @@ WiFiClient clients[CLIENTS];
 byte clientsWaitJob[CLIENTS];
 int clientsShares[CLIENTS];
 String clientsBuffer[CLIENTS];
+unsigned long clientsTimes[CLIENTS];
 
 bool clients_connected(byte i)
 {
+  wire_readLine(i);
   if (clients[i].connected())
   {
     return true;
@@ -42,6 +44,7 @@ bool clients_connected(byte i)
   }
   clientsShares[i] = 0;
   clientsWaitJob[i] = 0;
+  clientsTimes[i] = millis();
   clientsBuffer[i] = "";
   waitForClientData(clients[i]);
   return true;
@@ -132,12 +135,29 @@ void clients_waitFeedbackJobDone(byte i)
   String clientBuffer = clients_readData(i);
   if (clientBuffer.length() > 0)
   {
+    unsigned long time = (millis() - clientsTimes[i]);
     clientsShares[i]++;
     int Shares = clientsShares[i];
     Serial.print("[" + String(i) + "]");
-    Serial.println("Job " + clientBuffer  + ": Share #" + String(Shares));
+    Serial.println("Job " + clientBuffer  + ": Share #" + String(Shares) + " " + timeString(time));
     clientsWaitJob[i] = 0;
   }
+}
+
+String timeString(unsigned long t) {
+  String str = "";
+  t /= 1000;
+  int s = t % 60;
+  int m = (t / 60) % 60;
+  int h = (t / 3600);
+  str += h;
+  str += ":";
+  if (m < 10) str += "0";
+  str += m;
+  str += ":";
+  if (s < 10) str += "0";
+  str += s;
+  return str;
 }
 
 
