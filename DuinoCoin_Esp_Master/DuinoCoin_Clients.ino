@@ -29,11 +29,13 @@ unsigned long clientsTimes[CLIENTS];
 
 bool clients_connected(byte i)
 {
-  wire_readLine(i);
   if (clients[i].connected())
   {
     return true;
   }
+
+  wire_readLine(i);
+
   Serial.print("[" + String(i) + "]");
   Serial.println("Connecting to Duino-Coin server...");
   if (!clients[i].connect(host, port))
