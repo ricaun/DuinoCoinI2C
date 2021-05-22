@@ -125,7 +125,7 @@ void loop() {
   if (runEvery(5000))
   {
     Serial.print("[ ]");
-    Serial.println("FreeRam: " + String(ESP.getFreeHeap()));
+    Serial.println("FreeRam: " + String(ESP.getFreeHeap()) + " " + clients_string());
   }
 }
 

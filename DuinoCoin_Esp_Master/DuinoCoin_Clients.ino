@@ -27,7 +27,14 @@ int clientsShares[CLIENTS];
 String clientsBuffer[CLIENTS];
 unsigned long clientsTimes[CLIENTS];
 
+unsigned long clientsConnectTime = 0;
+
 bool clients_connected(byte i)
+{
+  return clients[i].connected();
+}
+
+bool clients_connect(byte i)
 {
   if (clients[i].connected())
   {
@@ -38,6 +45,7 @@ bool clients_connected(byte i)
 
   Serial.print("[" + String(i) + "]");
   Serial.println("Connecting to Duino-Coin server...");
+
   if (!clients[i].connect(host, port))
   {
     Serial.print("[" + String(i) + "]");
@@ -48,14 +56,37 @@ bool clients_connected(byte i)
   clientsWaitJob[i] = 0;
   clientsTimes[i] = millis();
   clientsBuffer[i] = "";
-  waitForClientData(clients[i]);
+  Serial.print("[" + String(i) + "]");
+  Serial.println(waitForClientData(i));
   return true;
 }
 
+bool clients_stop(byte i)
+{
+  clients[i].stop();
+  return true;
+}
+
+int client_i = 0;
+
 void clients_loop()
 {
-  for (int i = 0; i < CLIENTS; i++)
+  if (clients_runEvery(clientsConnectTime))
   {
+    clientsConnectTime = 30000;
+    for (client_i = 0; client_i < CLIENTS; client_i++)
+    {
+      int i = client_i;
+      if (wire_exists(i + 1) && !clients_connect(i)) 
+      {
+        break;
+      }
+    }
+  }
+  
+  for (client_i = 0; client_i < CLIENTS; client_i++)
+  {
+    int i = client_i;
     if (wire_exists(i + 1) && clients_connected(i))
     {
 
@@ -102,7 +133,7 @@ void clients_waitRequestJob(byte i)
 
     Serial.print("[" + String(i) + "]");
     Serial.println("Job Receive: " + String(diff));
-    
+
     wire_sendJob(i + 1, hash, job, diff);
     clientsWaitJob[i] = 2;
   }
@@ -123,7 +154,7 @@ void clients_sendJobDone(byte i)
 
     if (id.length() > 0) id = "," + id;
 
-    String identifier = String(rigIdentifier)+ "-" + String(i);
+    String identifier = String(rigIdentifier) + "-" + String(i);
 
     clients[i].print(String(job) + "," + String(HashRate) + "," + MINER + "," + String(identifier) + id);
     Serial.print("[" + String(i) + "]");
@@ -143,7 +174,33 @@ void clients_waitFeedbackJobDone(byte i)
     Serial.print("[" + String(i) + "]");
     Serial.println("Job " + clientBuffer  + ": Share #" + String(Shares) + " " + timeString(time));
     clientsWaitJob[i] = 0;
+
+    if (clientBuffer == "BAD") 
+    {
+      Serial.println("[" + String(i) + "]" + "BAD BAD BAD BAD");
+      clients_stop(i);
+    }
+    
   }
+}
+
+String clients_string()
+{
+  int i = 0;
+  String str;
+  str += "I2C Connected";
+  str += "[";
+  str += " ";
+  for (i = 0; i < CLIENTS; i++)
+  {
+    if (wire_exists(i + 1))
+    {
+      str += (i + 1);
+      str += " ";
+    }
+  }
+  str += "]";
+  return str;
 }
 
 String timeString(unsigned long t) {
@@ -173,7 +230,7 @@ String clients_readData(byte i)
       str = clientsBuffer[i];
       clientsBuffer[i] = "";
     }
-    else 
+    else
       clientsBuffer[i] += c;
   }
   return str;
@@ -197,17 +254,33 @@ String getValue(String data, char separator, int index)
   return found > index ? data.substring(strIndex[0], strIndex[1]) : "";
 }
 
-String waitForClientData(WiFiClient & client) {
+String waitForClientData(int i) {
+  unsigned long previousMillis = millis();
+  unsigned long interval = 10000;
+
   String buffer;
-  while (client.connected()) {
-    if (client.available()) {
-      buffer = client.readStringUntil(END_TOKEN);
+  while (clients[i].connected()) {
+    if (clients[i].available()) {
+      buffer = clients[i].readStringUntil(END_TOKEN);
       if (buffer.length() == 1 && buffer[0] == END_TOKEN)
         buffer = "???\n"; // NOTE: Should never happen...
       if (buffer.length() > 0)
         break;
     }
+    if (millis() - previousMillis >= interval) break;
     handleSystemEvents();
   }
   return buffer;
+}
+
+boolean clients_runEvery(unsigned long interval)
+{
+  static unsigned long previousMillis = 0;
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousMillis >= interval)
+  {
+    previousMillis = currentMillis;
+    return true;
+  }
+  return false;
 }
