@@ -77,7 +77,8 @@ bool DuinoCoin_loop()
     // Start time measurement
     unsigned long startTime = micros();
     // Call DUCO-S1A hasher
-    unsigned int ducos1result = Ducos1a.work(lastblockhash, newblockhash, difficulty);
+    unsigned int ducos1result = 0;
+    if (difficulty < 655) ducos1result = Ducos1a.work(lastblockhash, newblockhash, difficulty);
     // End time measurement
     unsigned long endTime = micros();
     // Calculate elapsed time
