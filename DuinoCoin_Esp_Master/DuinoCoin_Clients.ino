@@ -11,6 +11,7 @@
 #endif
 #if ESP32
 #include <WiFi.h>
+#include <WiFiClient.h>
 #endif
 
 #define CLIENTS 10
@@ -26,6 +27,8 @@ byte clientsWaitJob[CLIENTS];
 int clientsShares[CLIENTS];
 String clientsBuffer[CLIENTS];
 unsigned long clientsTimes[CLIENTS];
+unsigned long clientsTimeOut[CLIENTS];
+byte clientsBadJob[CLIENTS];
 
 unsigned long clientsConnectTime = 0;
 
@@ -53,11 +56,14 @@ bool clients_connect(byte i)
     return false;
   }
   clientsShares[i] = 0;
-  clientsWaitJob[i] = 0;
+  clientsWaitJob[i] = 4;
+  clientsBadJob[i] = 0;
   clientsTimes[i] = millis();
+  clientsTimeOut[i] = millis();
   clientsBuffer[i] = "";
-  Serial.print("[" + String(i) + "]");
-  Serial.println(waitForClientData(i));
+  //Serial.print("[" + String(i) + "]");
+  //String version = waitForClientData(i);
+  //Serial.println(version);
   return true;
 }
 
@@ -77,18 +83,23 @@ void clients_loop()
     for (client_i = 0; client_i < CLIENTS; client_i++)
     {
       int i = client_i;
-      if (wire_exists(i + 1) && !clients_connect(i)) 
+      if (wire_exists(i + 1) && !clients_connect(i))
       {
         break;
       }
     }
   }
-  
+
   for (client_i = 0; client_i < CLIENTS; client_i++)
   {
     int i = client_i;
     if (wire_exists(i + 1) && clients_connected(i))
     {
+
+      if (clientsWaitJob[i] == 4)
+      {
+        clients_waitRequestVersion(i);
+      }
 
       if (clientsWaitJob[i] == 0)
       {
@@ -110,7 +121,23 @@ void clients_loop()
         clients_waitFeedbackJobDone(i);
       }
 
+      if (millis() - clientsTimeOut[i] > 30000)
+      {
+        Serial.println("[" + String(i) + "]" + " --------------- TIMEOUT ------------- ");
+        clients_stop(i);
+      }
+
     }
+  }
+}
+
+void clients_waitRequestVersion(byte i)
+{
+  if (clients[i].available()) {
+    String buffer = clients[i].readStringUntil(END_TOKEN);
+    Serial.println("[" + String(i) + "]" + buffer);
+    clientsWaitJob[i] = 0;
+    clientsTimeOut[i] = millis();
   }
 }
 
@@ -120,6 +147,7 @@ void clients_requestJob(byte i)
   Serial.println("Job Request: " + String(ducouser));
   clients[i].print("JOB," + String(ducouser) + "," + JOB);
   clientsWaitJob[i] = 1;
+  clientsTimeOut[i] = millis();
 }
 
 void clients_waitRequestJob(byte i)
@@ -136,6 +164,7 @@ void clients_waitRequestJob(byte i)
 
     wire_sendJob(i + 1, hash, job, diff);
     clientsWaitJob[i] = 2;
+    clientsTimeOut[i] = millis();
   }
 }
 
@@ -156,10 +185,11 @@ void clients_sendJobDone(byte i)
 
     String identifier = String(rigIdentifier) + "-" + String(i);
 
-    clients[i].print(String(job) + "," + String(HashRate) + "," + MINER + "," + String(identifier) + id);
+    clients[i].print(String(job) + "," + String(HashRate, 2) + "," + MINER + "," + String(identifier) + id);
     Serial.print("[" + String(i) + "]");
     Serial.println("Job Done: (" + String(job) + ")" + " Hashrate: " + String(HashRate));
     clientsWaitJob[i] = 3;
+    clientsTimeOut[i] = millis();
   }
 }
 
@@ -175,12 +205,17 @@ void clients_waitFeedbackJobDone(byte i)
     Serial.println("Job " + clientBuffer  + ": Share #" + String(Shares) + " " + timeString(time));
     clientsWaitJob[i] = 0;
 
-    if (clientBuffer == "BAD") 
+    if (clientBuffer == "BAD")
     {
       Serial.println("[" + String(i) + "]" + "BAD BAD BAD BAD");
-      clients_stop(i);
+      if (clientsBadJob[i]++ > 3)
+        clients_stop(i);
     }
-    
+    else
+    {
+      clientsBadJob[i] = 0;
+    }
+    clientsTimeOut[i] = millis();
   }
 }
 
@@ -195,7 +230,7 @@ String clients_string()
   {
     if (wire_exists(i + 1))
     {
-      str += (i + 1);
+      str += (i);
       str += " ";
     }
   }
@@ -261,6 +296,7 @@ String waitForClientData(int i) {
   String buffer;
   while (clients[i].connected()) {
     if (clients[i].available()) {
+      Serial.println(clients[i].available());
       buffer = clients[i].readStringUntil(END_TOKEN);
       if (buffer.length() == 1 && buffer[0] == END_TOKEN)
         buffer = "???\n"; // NOTE: Should never happen...
