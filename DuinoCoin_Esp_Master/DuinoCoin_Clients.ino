@@ -20,7 +20,7 @@
 #define SEP_TOKEN  ','
 
 const char * host = "51.15.127.80"; // Static server IP
-const int port = 2815;
+const int port = 2814;
 
 WiFiClient clients[CLIENTS];
 byte clientsWaitJob[CLIENTS];
