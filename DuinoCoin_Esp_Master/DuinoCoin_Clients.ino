@@ -20,7 +20,7 @@
 #define SEP_TOKEN  ','
 
 const char * host = "51.15.127.80"; // Static server IP
-const int port = 2814;
+const int ports[] = {2813, 2814, 2816, 2812};
 
 WiFiClient clients[CLIENTS];
 byte clientsWaitJob[CLIENTS];
@@ -39,6 +39,10 @@ bool clients_connected(byte i)
 
 bool clients_connect(byte i)
 {
+  static int port = 0;
+  int port_size = sizeof(ports) / sizeof(ports[0]);
+  if (port >= port_size) port = 0;
+
   if (clients[i].connected())
   {
     return true;
