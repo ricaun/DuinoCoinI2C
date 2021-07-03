@@ -39,9 +39,8 @@ bool clients_connected(byte i)
 
 bool clients_connect(byte i)
 {
-  static int port = 0;
   int port_size = sizeof(ports) / sizeof(ports[0]);
-  if (port >= port_size) port = 0;
+  int port_number = random(0, port_size - 1);
 
   if (clients[i].connected())
   {
@@ -51,9 +50,9 @@ bool clients_connect(byte i)
   wire_readLine(i);
 
   Serial.print("[" + String(i) + "]");
-  Serial.println("Connecting to Duino-Coin server...");
+  Serial.println("Connecting to Duino-Coin server... with port " + String(ports[port_number]));
 
-  if (!clients[i].connect(host, port))
+  if (!clients[i].connect(host, ports[port_number]))
   {
     Serial.print("[" + String(i) + "]");
     Serial.println("Connection failed.");
