@@ -45,24 +45,18 @@ The code supports 10 clients and can be changed on the define:
 
 # Connection Pinouts
 
-Connect the pins of the Esp8266 or Esp32 on the Arduino like the table/images below.
+Connect the pins of the Esp8266 or Esp32 on the Arduino like the table/images below, use a [Logic Level Converter](https://www.sparkfun.com/products/12009) to connect between the ESP and Arduino.
 
-|| ESP8266 | ESP32 | Arduino |
-|:-:| :----: | :----: | :-----: |
-||3.3V | 3.3V | 5V |
-||GND | GND | GND |
-|`SCL`|D1 (GPIO5) | GPIO22 | A5 |
-|`SDA`|D2 (GPIO4) | GPIO21 | A4 |
+|| ESP8266 | ESP32 | Logic Level Converter | Arduino |
+|:-:| :----: | :----: | :-----: | :-----: |
+||3.3V | 3.3V | <---> | 5V |
+||GND | GND | <---> | GND |
+|`SCL`|D1 (GPIO5) | GPIO22 | <---> | A5 |
+|`SDA`|D2 (GPIO4) | GPIO21 | <---> | A4 |
 
-<h3>WARNING: Do not connect the USB of the Arduino, all the boards are powered by 3.3V.</h3>
 
-### Esp8266 with one Arduino Nano.
 
-<img src="Resources/Fritzing/DuinoCoinI2C/DuinoCoinI2C_1xNano.png" alt="DuinoCoinI2C" width="50%">
-
-### Esp8266 with three Arduino Nano
-
-<img src="Resources/Fritzing/DuinoCoinI2C/DuinoCoinI2C_3xNano.png" alt="DuinoCoinI2C" width="50%">
+<img src="Resources/Fritzing/DuinoCoinI2C/DuinoCoinI2C_LLC.png" alt="DuinoCoinI2C" width="100%">
 
 ---
 
