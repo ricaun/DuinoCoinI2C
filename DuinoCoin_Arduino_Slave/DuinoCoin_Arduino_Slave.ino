@@ -8,6 +8,7 @@ void setup() {
   Serial.begin(115200);
   DuinoCoin_setup();
   pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
 }
 
 void loop() {
@@ -15,9 +16,13 @@ void loop() {
   {
     Serial.print(F("Job Done : "));
     Serial.print(DuinoCoin_response());
+    Blink();
   }
-  if (runEvery(250))
-  {
-    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-  }
+}
+
+void Blink()
+{
+  digitalWrite(LED_BUILTIN, HIGH);
+  delay(100);
+  digitalWrite(LED_BUILTIN, LOW);
 }
