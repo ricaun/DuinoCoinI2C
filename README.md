@@ -54,9 +54,13 @@ Connect the pins of the Esp8266 or Esp32 on the Arduino like the table/images be
 |`SCL`|D1 (GPIO5) | GPIO22 | <---> | A5 |
 |`SDA`|D2 (GPIO4) | GPIO21 | <---> | A4 |
 
-
-
 <img src="Resources/Fritzing/DuinoCoinI2C/DuinoCoinI2C_LLC.png" alt="DuinoCoinI2C" width="100%">
+
+## Custom PCB
+
+[ericddm](https://github.com/ericddm) shared this amazing pcb!
+
+<img src="Resources/image/DuinoCoinI2C_ericddm.jpg" alt="DuinoCoinI2C" width="100%">
 
 ---
 
