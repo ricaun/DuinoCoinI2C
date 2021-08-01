@@ -6,6 +6,7 @@
 
 #if ESP8266
 #include <ESP8266HTTPClient.h>
+#include <WiFiClient.h>
 #endif
 #if ESP32
 #include <HTTPClient.h>
@@ -40,18 +41,20 @@ void UpdatePool()
 String httpGetString(String URL)
 {
   String payload = "";
-  HTTPClient http;
   WiFiClient client;
-  http.begin(client, URL);
-  int httpCode = http.GET();
-  if (httpCode == HTTP_CODE_OK)
+  HTTPClient http;
+  if (http.begin(client, URL))
   {
-    payload = http.getString();
+    int httpCode = http.GET();
+    if (httpCode == HTTP_CODE_OK)
+    {
+      payload = http.getString();
+    }
+    else
+    {
+      Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+    }
+    http.end();
   }
-  else
-  {
-    Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
-  }
-  http.end();
   return payload;
 }
