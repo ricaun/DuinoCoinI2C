@@ -31,7 +31,7 @@ After the job is done, the slave sends back the response to the master (Esp8266/
 ## Library Dependency
 
 * [ArduinoJson](https://github.com/bblanchon/ArduinoJson) (Request Pool Version 2.6)
-* [ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServerD) (ESPAsyncWebServer)
+* [ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServer) (ESPAsyncWebServer)
     * [ESPAsyncTCP](https://github.com/me-no-dev/ESPAsyncTCP) (ESP8266)
     * [AsyncTCP](https://github.com/me-no-dev/AsyncTCP) (ESP32)
 
