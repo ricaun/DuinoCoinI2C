@@ -41,7 +41,8 @@ String httpGetString(String URL)
 {
   String payload = "";
   HTTPClient http;
-  http.begin(URL);
+  WiFiClient client;
+  http.begin(client, URL);
   int httpCode = http.GET();
   if (httpCode == HTTP_CODE_OK)
   {
