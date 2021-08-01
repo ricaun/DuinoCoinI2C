@@ -295,7 +295,7 @@ String clients_string()
 {
   int i = 0;
   String str;
-  str += "I2C Connected";
+  str += "I2C ";
   str += "[";
   str += " ";
   for (i = 0; i < CLIENTS; i++)

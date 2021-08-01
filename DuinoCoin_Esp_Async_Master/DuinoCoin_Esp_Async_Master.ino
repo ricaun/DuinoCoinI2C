@@ -129,6 +129,8 @@ void setup() {
   Serial.print("\nDuino-Coin");
   Serial.println(MINER);
 
+  oled_setup();
+
   wire_setup();
   SetupWifi();
   SetupOTA();
@@ -136,17 +138,19 @@ void setup() {
   server_setup();
   
   UpdatePool();
+
   blink(BLINK_SETUP_COMPLETE);
 }
 
 void loop() {
   ArduinoOTA.handle();
   clients_loop();
-  if (runEvery(5000))
+  if (runEvery(1000))
   {
     Serial.print("[ ]");
     Serial.println("FreeRam: " + String(ESP.getFreeHeap()) + " " + clients_string());
     ws_sendAll("FreeRam: " + String(ESP.getFreeHeap()) + " - " + clients_string());
+    oled_display(WiFi.localIP().toString() + "\n" + String(ESP.getFreeHeap()) + "\n" + clients_string());
   }
 }
 

@@ -14,8 +14,6 @@ void setup() {
 void loop() {
   if (DuinoCoin_loop())
   {
-    Serial.print(F("Job Done : "));
-    Serial.print(DuinoCoin_response());
     Blink();
   }
 }

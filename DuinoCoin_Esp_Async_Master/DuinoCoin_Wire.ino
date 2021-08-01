@@ -16,12 +16,20 @@
 #define SCL 22
 #endif
 
+#define WIRE_CLOCK 100000
+
 void wire_setup()
 {
   //pinMode(SDA, INPUT_PULLUP);
   //pinMode(SCL, INPUT_PULLUP);
-  Wire.begin(SDA, SCL);
+  wire_start();
   wire_readAll();
+}
+
+void wire_start()
+{
+  Wire.begin(SDA, SCL);
+  Wire.setClock(WIRE_CLOCK);
 }
 
 void wire_readAll()
@@ -39,6 +47,7 @@ void wire_readAll()
 
 boolean wire_exists(byte address)
 {
+  wire_start();
   Wire.beginTransmission(address);
   byte error = Wire.endTransmission();
   return (error == 0);
@@ -57,6 +66,7 @@ void Wire_sendln(byte address, String message)
 
 void Wire_send(byte address, String message)
 {
+  wire_start();
   for (int i = 0; i < message.length(); i++)
   {
     Wire.beginTransmission(address);
@@ -71,6 +81,7 @@ String wire_readLine(int address)
   char end = '\n';
   String str = "";
   boolean done = false;
+  wire_start();
   while (!done)
   {
     Wire.requestFrom(address, 1);
