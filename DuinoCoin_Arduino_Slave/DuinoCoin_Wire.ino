@@ -84,6 +84,7 @@ bool DuinoCoin_loop()
     // Calculate elapsed time
     unsigned long elapsedTime = endTime - startTime;
     // Send result back to the program with share time
+    if (bufferRequest.available()) bufferRequest.read();
     bufferRequest.print(String(ducos1result) + "," + String(elapsedTime) + "," + String(get_DUCOID()) + "\n");
     return true;
   }
