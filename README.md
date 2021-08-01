@@ -34,7 +34,8 @@ After the job is done, the slave sends back the response to the master (Esp8266/
 * [ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServer) (ESPAsyncWebServer)
     * [ESPAsyncTCP](https://github.com/me-no-dev/ESPAsyncTCP) (ESP8266)
     * [AsyncTCP](https://github.com/me-no-dev/AsyncTCP) (ESP32)
-
+* [SSD1306Wire](https://github.com/ThingPulse/esp8266-oled-ssd1306/) (SSD1306Wire)
+    
 ## Max Client/Slave
 
 The code supports 10 clients and can be changed on the define:

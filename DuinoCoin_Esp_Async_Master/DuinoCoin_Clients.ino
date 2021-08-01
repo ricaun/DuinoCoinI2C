@@ -85,6 +85,8 @@ bool clients_connect(byte i)
     Serial.println("Connection failed.");
     return false;
   }
+  clients[i].setTimeout(100);
+  
   clientsShares[i] = 0;
   clientsBadJob[i] = 0;
   clientsTimes[i] = millis();
