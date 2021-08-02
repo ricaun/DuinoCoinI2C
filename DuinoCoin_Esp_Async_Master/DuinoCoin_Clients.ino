@@ -79,6 +79,7 @@ bool clients_connect(byte i)
 
   ws_sendAll("[" + String(i) + "]" + "Connecting to Duino-Coin server...");
 
+  clients[i].setTimeout(5000);
   if (!clients[i].connect(host.c_str(), port))
   {
     Serial.print("[" + String(i) + "]");
