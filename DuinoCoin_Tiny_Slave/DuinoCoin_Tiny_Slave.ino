@@ -10,7 +10,10 @@
 #include <avr/pgmspace.h>
 #include <stdlib.h>
 
+#if defined(ARDUINO_ARCH_AVR)
 #define SERIAL_LOGGER Serial
+#define LED 13
+#endif
 
 #ifdef SERIAL_LOGGER
 #define SerialBegin()              SERIAL_LOGGER.begin(115200);
@@ -21,8 +24,6 @@
 #define SerialPrint(x)
 #define SerialPrintln(x)
 #endif
-
-#define LED 13
 
 #ifdef LED
 #define LedBegin()                pinMode(LED, OUTPUT);
@@ -108,6 +109,7 @@ void do_work()
   if (working)
   {
     LedHigh();
+    SerialPrintln(buffer);
     if (buffer[0] == '#')
     {
       resetFunc();
@@ -204,11 +206,31 @@ void initialize_i2c(void) {
     address = WIRE_ID;
     EEPROM.write(EEPROM_ADDRESS, address);
   }
+  address = find_i2c();
   SerialPrint("Wire begin ");
   SerialPrintln(address);
   Wire.begin(address);
   Wire.onReceive(onReceiveJob);
   Wire.onRequest(onRequestResult);
+}
+
+byte find_i2c()
+{
+  unsigned long time = (unsigned long) getTrueRotateRandomByte() * 1000 + (unsigned long) getTrueRotateRandomByte();
+  delayMicroseconds(time);
+  Wire.begin();
+  int address;
+  for (address = 1; address < 127; address++ )
+  {
+    Wire.beginTransmission(address);
+    int error = Wire.endTransmission();
+    if (error != 0)
+    {
+      break;
+    }
+  }
+  Wire.end();
+  return address;
 }
 
 void onReceiveJob(int howMany) {
@@ -238,4 +260,68 @@ void onRequestResult() {
     }
   }
   Wire.write(c);
+}
+
+// ---------------------------------------------------------------
+// True Random Numbers
+// https://gist.github.com/bloc97/b55f684d17edd8f50df8e918cbc00f94
+// ---------------------------------------------------------------
+
+#ifdef AVR_PRO
+#define ANALOG_RANDOM A6
+#else
+#define ANALOG_RANDOM A1
+#endif
+
+const int waitTime = 16;
+
+byte lastByte = 0;
+byte leftStack = 0;
+byte rightStack = 0;
+
+byte rotate(byte b, int r) {
+  return (b << r) | (b >> (8-r));
+}
+
+void pushLeftStack(byte bitToPush) {
+  leftStack = (leftStack << 1) ^ bitToPush ^ leftStack;
+}
+
+void pushRightStackRight(byte bitToPush) {
+  rightStack = (rightStack >> 1) ^ (bitToPush << 7) ^ rightStack;
+}
+
+byte getTrueRotateRandomByte() {
+  byte finalByte = 0;
+  
+  byte lastStack = leftStack ^ rightStack;
+  
+  for (int i=0; i<4; i++) {
+    delayMicroseconds(waitTime);
+    int leftBits = analogRead(ANALOG_RANDOM);
+    
+    delayMicroseconds(waitTime);
+    int rightBits = analogRead(ANALOG_RANDOM);
+    
+    finalByte ^= rotate(leftBits, i);
+    finalByte ^= rotate(rightBits, 7-i);
+    
+    for (int j=0; j<8; j++) {
+      byte leftBit = (leftBits >> j) & 1;
+      byte rightBit = (rightBits >> j) & 1;
+  
+      if (leftBit != rightBit) {
+        if (lastStack % 2 == 0) {
+          pushLeftStack(leftBit);
+        } else {
+          pushRightStackRight(leftBit);
+        }
+      }
+    }
+    
+  }
+  lastByte ^= (lastByte >> 3) ^ (lastByte << 5) ^ (lastByte >> 4);
+  lastByte ^= finalByte;
+  
+  return lastByte ^ leftStack ^ rightStack;
 }

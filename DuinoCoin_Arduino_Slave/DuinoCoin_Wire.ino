@@ -20,7 +20,7 @@ void DuinoCoin_setup()
   pinMode(A5, INPUT_PULLUP);
   pinMode(A4, INPUT_PULLUP);
   
-  unsigned long time = getTrueRotateRandomByte() * 1000 + getTrueRotateRandomByte();
+  unsigned long time = (unsigned long) getTrueRotateRandomByte() * 1000 + (unsigned long) getTrueRotateRandomByte();
   delayMicroseconds(time);
   Wire.begin();
   for (int address = 1; address < 127; address++ )
