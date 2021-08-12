@@ -18,6 +18,7 @@ const char * urlPool = "http://51.15.127.80:4242/getPool";
 
 void UpdateHostPort(String input)
 {
+  // {"ip":"server.duinocoin.com","port":2812,"name":"Main server"}
   DynamicJsonDocument doc(256);
   deserializeJson(doc, input);
 
