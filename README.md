@@ -22,6 +22,55 @@ All Slaves have the same code and should select the I2C Address automatically.
 
 The I2C Address on the Arduino is automatically updated when the board starts, if an Address already exists on the I2C bus the code finds another Address to use.
 
+# Tiny - Slave
+
+Tiny Slaves have the same code and the I2C Address is selected by the EEPROM.
+
+## Library Dependency
+* [ArduinoUniqueID](https://github.com/ricaun/ArduinoUniqueID) (Handle the chip ID)
+
+## Defines
+
+The code has some defines to make the code smaller and disable some features.
+
+### Serial
+This enable the Serial Monitor.
+
+```
+#define SERIAL_LOGGER Serial
+```
+
+### LED
+This enable the led output and makes de led flash when the slave is working.
+
+```
+#define LED 13
+```
+
+
+## Serial set I2C Address 
+
+If the Serial is enable on your mcu, you could send the I2C Address using the Serial Monitor.
+
+## ATtiny85
+
+You could use this code to generate a `ATtiny85` slave using the `http://drazzy.com/package_drazzy.com_index.json` boards on the Arduino IDE.
+
+### I2C pinOut
+
+| pinOut | ATtiny85 |
+|:-:| :-----: |
+|`SCL`| PB2 |
+|`SDA`| PB0 |
+
+### I2C Address 
+
+I2C Address is selected by the `EEPROM_ADDRESS` (default 0) and the first upload the Address is set by the define.
+
+```
+#define WIRE_ID 1
+```
+
 # Esp8266/Esp32 - Master
 
 The master requests the job on the `DuinoCoin` server and sends the work to the slave (Arduino).
