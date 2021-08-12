@@ -16,11 +16,14 @@
 #define SCL 22
 #endif
 
+#define WIRE_CLOCK 100000
+
 void wire_setup()
 {
   //pinMode(SDA, INPUT_PULLUP);
   //pinMode(SCL, INPUT_PULLUP);
   Wire.begin(SDA, SCL);
+  Wire.setClock(WIRE_CLOCK);
   wire_readAll();
 }
 
