@@ -52,9 +52,12 @@ This enable the led output and makes de led flash when the slave is working.
 
 If the Serial is enable on your mcu, you could send the I2C Address using the Serial Monitor.
 
-## ATtiny85
+## ATtiny85 - ATTinyCore
 
-You could use this code to generate a `ATtiny85` slave using the `http://drazzy.com/package_drazzy.com_index.json` boards on the Arduino IDE.
+You could use this code to generate a `ATtiny85` slave using the `http://drazzy.com/package_drazzy.com_index.json` boards on the Arduino IDE. 
+
+Check the [ATTinyCore](https://github.com/SpenceKonde/ATTinyCore/) project for more information.
+
 
 ### I2C pinOut
 
