@@ -11,7 +11,7 @@
 
 #if defined(ARDUINO_AVR_UNO) | defined(ARDUINO_AVR_PRO)
 #define SERIAL_LOGGER Serial
-#define LED 13
+#define LED LED_BUILTIN
 #endif
 
 // ATtiny85 - http://drazzy.com/package_drazzy.com_index.json

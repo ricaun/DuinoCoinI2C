@@ -44,7 +44,7 @@ This enable the Serial Monitor.
 This enable the led output and makes de led flash when the slave is working.
 
 ```
-#define LED 13
+#define LED LED_BUILTIN
 ```
 
 
