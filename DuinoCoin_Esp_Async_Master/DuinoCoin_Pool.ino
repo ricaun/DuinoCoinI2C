@@ -18,17 +18,15 @@ const char * urlPool = "http://51.15.127.80:4242/getPool";
 
 void UpdateHostPort(String input)
 {
-  // {"name":"pulse-pool-1","ip":"149.91.88.18","port":"6000","connections":0}
   DynamicJsonDocument doc(256);
   deserializeJson(doc, input);
 
   const char* name = doc["name"];
   const char* ip = doc["ip"];
-  const char* port = doc["port"];
-  int connections = doc["connections"];
+  int port = doc["port"];
 
   Serial.println("[ ]Update " + String(name) + " " + String(ip) + " " + String(port));
-  SetHostPort(String(host), String(port).toInt());
+  SetHostPort(String(host), port);
 }
 
 void UpdatePool()
