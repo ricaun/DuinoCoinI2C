@@ -33,17 +33,34 @@ void server_setup()
   ws.onEvent(onWsEvent);
   server.addHandler(&ws);
 
-  #ifdef ESP8266
+#ifdef ESP8266
   SPIFFS.begin();
-  server.addHandler(new SPIFFSEditor(http_username,http_password));
-  #endif
-  #ifdef ESP32
+  server.addHandler(new SPIFFSEditor(http_username, http_password));
+#endif
+#ifdef ESP32
   SPIFFS.begin(true);
-  server.addHandler(new SPIFFSEditor(SPIFFS,http_username,http_password));
-  #endif
+  server.addHandler(new SPIFFSEditor(SPIFFS, http_username, http_password));
+#endif
 
   server.on("/heap", HTTP_GET, [](AsyncWebServerRequest * request) {
     request->send(200, "text/plain", String(ESP.getFreeHeap()));
+  });
+
+  server.on("/set", HTTP_GET, [](AsyncWebServerRequest * request) {
+    String ret = "";
+    if(request->hasArg("host"))
+    {
+      String host = request->arg("host");
+      ret += SetHost(host);
+    }
+    ret += " ";
+    if(request->hasArg("port"))
+    {
+      int port = request->arg("port").toInt();
+      SetPort(port);
+      ret += port;
+    }
+    request->send(200, "text/plain", ret);
   });
 
   server.on("/clients", HTTP_GET, [](AsyncWebServerRequest * request) {
@@ -90,48 +107,18 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
         char buff[3];
         for (size_t i = 0; i < info->len; i++) {
           sprintf(buff, "%02x ", (uint8_t) data[i]);
-          msg += buff ;
+          msg += buff;
         }
       }
+
+      wire_SendAll(msg.c_str());
+      
       Serial.printf("%s\n", msg.c_str());
 
       if (info->opcode == WS_TEXT)
         client->text("I got your text message");
       else
         client->binary("I got your binary message");
-    } else {
-      //message is comprised of multiple frames or the frame is split into multiple packets
-      if (info->index == 0) {
-        if (info->num == 0)
-          Serial.printf("ws[%s][%u] %s-message start\n", server->url(), client->id(), (info->message_opcode == WS_TEXT) ? "text" : "binary");
-        Serial.printf("ws[%s][%u] frame[%u] start[%llu]\n", server->url(), client->id(), info->num, info->len);
-      }
-
-      Serial.printf("ws[%s][%u] frame[%u] %s[%llu - %llu]: ", server->url(), client->id(), info->num, (info->message_opcode == WS_TEXT) ? "text" : "binary", info->index, info->index + len);
-
-      if (info->opcode == WS_TEXT) {
-        for (size_t i = 0; i < info->len; i++) {
-          msg += (char) data[i];
-        }
-      } else {
-        char buff[3];
-        for (size_t i = 0; i < info->len; i++) {
-          sprintf(buff, "%02x ", (uint8_t) data[i]);
-          msg += buff ;
-        }
-      }
-      Serial.printf("%s\n", msg.c_str());
-
-      if ((info->index + len) == info->len) {
-        Serial.printf("ws[%s][%u] frame[%u] end[%llu]\n", server->url(), client->id(), info->num, info->len);
-        if (info->final) {
-          Serial.printf("ws[%s][%u] %s-message end\n", server->url(), client->id(), (info->message_opcode == WS_TEXT) ? "text" : "binary");
-          if (info->message_opcode == WS_TEXT)
-            client->text("I got your text message");
-          else
-            client->binary("I got your binary message");
-        }
-      }
-    }
+    } 
   }
 }

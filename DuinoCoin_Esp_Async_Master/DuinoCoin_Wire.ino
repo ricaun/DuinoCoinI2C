@@ -17,6 +17,7 @@
 #endif
 
 #define WIRE_CLOCK 100000
+#define WIRE_MAX 32
 
 void wire_setup()
 {
@@ -34,13 +35,26 @@ void wire_start()
 
 void wire_readAll()
 {
-  for (byte address = 1; address < 127; address++ )
+  for (byte address = 1; address < WIRE_MAX; address++ )
   {
     if (wire_exists(address))
     {
       Serial.print("Address: ");
       Serial.println(address);
       wire_readLine(address);
+    }
+  }
+}
+
+void wire_SendAll(String message)
+{
+  for (byte address = 1; address < WIRE_MAX; address++ )
+  {
+    if (wire_exists(address))
+    {
+      Serial.print("Address: ");
+      Serial.println(address);
+      Wire_sendln(address, message);
     }
   }
 }

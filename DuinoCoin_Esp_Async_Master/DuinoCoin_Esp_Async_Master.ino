@@ -135,6 +135,8 @@ void setup() {
   SetupWifi();
   SetupOTA();
 
+  oled_display(WiFi.localIP().toString() + "\n" + String(ESP.getFreeHeap()) + "\n" + clients_string());
+
   server_setup();
   
   UpdatePool();

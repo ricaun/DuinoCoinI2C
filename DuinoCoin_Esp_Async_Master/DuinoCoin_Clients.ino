@@ -32,6 +32,18 @@ void SetHostPort(String h, int p)
   port = p;
 }
 
+String SetHost(String h)
+{
+  host = h;
+  return host;
+}
+
+int SetPort(int p)
+{
+  port = p;
+  return port;
+}
+
 // State Machine
 enum Duino_State
 {
@@ -77,13 +89,14 @@ bool clients_connect(byte i)
   Serial.print("[" + String(i) + "]");
   Serial.println("Connecting to Duino-Coin server... with port " + String(port));
 
-  ws_sendAll("[" + String(i) + "]" + "Connecting to Duino-Coin server...");
+  ws_sendAll("[" + String(i) + "]" + "Connecting to Duino-Coin server... " + String(port));
 
-  clients[i].setTimeout(5000);
+  clients[i].setTimeout(30000);
   if (!clients[i].connect(host.c_str(), port))
   {
     Serial.print("[" + String(i) + "]");
     Serial.println("Connection failed.");
+    
     return false;
   }
   clients[i].setTimeout(100);

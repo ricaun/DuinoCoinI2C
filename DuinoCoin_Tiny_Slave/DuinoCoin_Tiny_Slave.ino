@@ -5,15 +5,20 @@
 */
 
 #include <ArduinoUniqueID.h>  // https://github.com/ricaun/ArduinoUniqueID
+#include <EEPROM.h>
 #include <Wire.h>
 #include "sha1.h"
-#include <avr/pgmspace.h>
-#include <stdlib.h>
 
-#if defined(ARDUINO_ARCH_AVR)
+#if defined(ARDUINO_AVR_UNO) | defined(ARDUINO_AVR_PRO)
 #define SERIAL_LOGGER Serial
 #define LED 13
 #endif
+
+// ATtiny85 - http://drazzy.com/package_drazzy.com_index.json
+// SCL - PB2 - 2
+// SDA - PB0 - 0
+
+//#define FIND_I2C
 
 #ifdef SERIAL_LOGGER
 #define SerialBegin()              SERIAL_LOGGER.begin(115200);
@@ -34,20 +39,16 @@
 #define LedBegin()
 #define LedHigh()
 #define LedLow()
+#define LedBlink()
 #endif
 
-#include <EEPROM.h>
 #define EEPROM_ADDRESS 0
-#define WIRE_ID 9 + 1
+#define WIRE_ID 0 + 1
 
 #define BUFFER_MAX 88
 #define HASH_BUFFER_SIZE 20
 #define CHAR_END '\n'
 #define CHAR_DOT ','
-
-// ATtiny85 - http://drazzy.com/package_drazzy.com_index.json
-// SCL - PB2 - 2
-// SDA - PB0 - 0
 
 static const char DUCOID[] PROGMEM = "DUCOID";
 static const char ZEROS[] PROGMEM = "000";
@@ -82,6 +83,13 @@ void setup() {
 void loop() {
   do_work();
   millis(); // ????? For some reason need this to work the i2c
+#ifdef SERIAL_LOGGER
+  if (SERIAL_LOGGER.available())
+  {
+    EEPROM.write(EEPROM_ADDRESS, SERIAL_LOGGER.parseInt());
+    resetFunc();
+  }
+#endif
 }
 
 // --------------------------------------------------------------------- //
@@ -110,11 +118,25 @@ void do_work()
   {
     LedHigh();
     SerialPrintln(buffer);
+
     if (buffer[0] == '#')
     {
       resetFunc();
     }
-    
+
+#ifdef FIND_I2C
+    if (buffer[0] == '@')
+    {
+      address = find_i2c();
+      memset(buffer, 0, sizeof(buffer));
+      buffer_position = 0;
+      buffer_length = 0;
+      working = false;
+      jobdone = false;
+      return;
+    }
+#endif
+
     do_job();
   }
   LedLow();
@@ -148,6 +170,8 @@ void do_job()
     if (UniqueID8[i] < 16) strcpy(buffer + strlen(buffer), "0");
     strcpy(buffer + strlen(buffer), cstr);
   }
+
+  SerialPrintln(buffer);
 
   buffer_position = 0;
   buffer_length = strlen(buffer);
@@ -200,37 +224,16 @@ uint32_t work(char * lastblockhash, char * newblockhash, int difficulty)
 // --------------------------------------------------------------------- //
 
 void initialize_i2c(void) {
-  // Not Working .......
   address = EEPROM.read(EEPROM_ADDRESS);
   if (address == 0 || address > 127) {
     address = WIRE_ID;
     EEPROM.write(EEPROM_ADDRESS, address);
   }
-  address = find_i2c();
   SerialPrint("Wire begin ");
   SerialPrintln(address);
   Wire.begin(address);
   Wire.onReceive(onReceiveJob);
   Wire.onRequest(onRequestResult);
-}
-
-byte find_i2c()
-{
-  unsigned long time = (unsigned long) getTrueRotateRandomByte() * 1000 + (unsigned long) getTrueRotateRandomByte();
-  delayMicroseconds(time);
-  Wire.begin();
-  int address;
-  for (address = 1; address < 127; address++ )
-  {
-    Wire.beginTransmission(address);
-    int error = Wire.endTransmission();
-    if (error != 0)
-    {
-      break;
-    }
-  }
-  Wire.end();
-  return address;
 }
 
 void onReceiveJob(int howMany) {
@@ -262,12 +265,38 @@ void onRequestResult() {
   Wire.write(c);
 }
 
+// --------------------------------------------------------------------- //
+// find_i2c
+// --------------------------------------------------------------------- //
+
+#ifdef FIND_I2C
+
+byte find_i2c()
+{
+  unsigned long time = (unsigned long) getTrueRotateRandomByte() * 1000 + (unsigned long) getTrueRotateRandomByte();
+  delayMicroseconds(time);
+  Wire.begin();
+  int address;
+  for (address = 1; address < 127; address++ )
+  {
+    Wire.beginTransmission(address);
+    int error = Wire.endTransmission();
+    if (error != 0)
+    {
+      break;
+    }
+  }
+  Wire.begin(address);
+  //Wire.end();
+  return address;
+}
+
 // ---------------------------------------------------------------
 // True Random Numbers
 // https://gist.github.com/bloc97/b55f684d17edd8f50df8e918cbc00f94
 // ---------------------------------------------------------------
 
-#ifdef AVR_PRO
+#if defined(ARDUINO_AVR_PRO)
 #define ANALOG_RANDOM A6
 #else
 #define ANALOG_RANDOM A1
@@ -280,7 +309,7 @@ byte leftStack = 0;
 byte rightStack = 0;
 
 byte rotate(byte b, int r) {
-  return (b << r) | (b >> (8-r));
+  return (b << r) | (b >> (8 - r));
 }
 
 void pushLeftStack(byte bitToPush) {
@@ -293,23 +322,23 @@ void pushRightStackRight(byte bitToPush) {
 
 byte getTrueRotateRandomByte() {
   byte finalByte = 0;
-  
+
   byte lastStack = leftStack ^ rightStack;
-  
-  for (int i=0; i<4; i++) {
+
+  for (int i = 0; i < 4; i++) {
     delayMicroseconds(waitTime);
     int leftBits = analogRead(ANALOG_RANDOM);
-    
+
     delayMicroseconds(waitTime);
     int rightBits = analogRead(ANALOG_RANDOM);
-    
+
     finalByte ^= rotate(leftBits, i);
-    finalByte ^= rotate(rightBits, 7-i);
-    
-    for (int j=0; j<8; j++) {
+    finalByte ^= rotate(rightBits, 7 - i);
+
+    for (int j = 0; j < 8; j++) {
       byte leftBit = (leftBits >> j) & 1;
       byte rightBit = (rightBits >> j) & 1;
-  
+
       if (leftBit != rightBit) {
         if (lastStack % 2 == 0) {
           pushLeftStack(leftBit);
@@ -318,10 +347,12 @@ byte getTrueRotateRandomByte() {
         }
       }
     }
-    
+
   }
   lastByte ^= (lastByte >> 3) ^ (lastByte << 5) ^ (lastByte >> 4);
   lastByte ^= finalByte;
-  
+
   return lastByte ^ leftStack ^ rightStack;
 }
+
+#endif
