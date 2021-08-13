@@ -28,8 +28,8 @@ int port = 6000;
 
 void SetHostPort(String h, int p)
 {
-  host = h;
-  port = p;
+  h = host;
+  p = port;
 }
 
 // State Machine
