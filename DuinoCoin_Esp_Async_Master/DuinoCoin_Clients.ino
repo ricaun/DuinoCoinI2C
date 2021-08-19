@@ -96,7 +96,7 @@ bool clients_connect(byte i)
   {
     Serial.print("[" + String(i) + "]");
     Serial.println("Connection failed.");
-    
+    UpdatePool();
     return false;
   }
   clients[i].setTimeout(100);
