@@ -20,6 +20,9 @@
 
 //#define FIND_I2C
 
+#define ADDRESS_I2C 1
+#define EEPROM_ADDRESS 0
+
 #ifdef SERIAL_LOGGER
 #define SerialBegin()              SERIAL_LOGGER.begin(115200);
 #define SerialPrint(x)             SERIAL_LOGGER.print(x);
@@ -41,9 +44,6 @@
 #define LedLow()
 #define LedBlink()
 #endif
-
-#define EEPROM_ADDRESS 0
-#define WIRE_ID 0 + 1
 
 #define BUFFER_MAX 88
 #define HASH_BUFFER_SIZE 20
@@ -86,7 +86,9 @@ void loop() {
 #ifdef SERIAL_LOGGER
   if (SERIAL_LOGGER.available())
   {
+#ifdef EEPROM_ADDRESS
     EEPROM.write(EEPROM_ADDRESS, SERIAL_LOGGER.parseInt());
+#endif
     resetFunc();
   }
 #endif
@@ -224,11 +226,16 @@ uint32_t work(char * lastblockhash, char * newblockhash, int difficulty)
 // --------------------------------------------------------------------- //
 
 void initialize_i2c(void) {
+  address = ADDRESS_I2C;
+
+#ifdef EEPROM_ADDRESS
   address = EEPROM.read(EEPROM_ADDRESS);
   if (address == 0 || address > 127) {
-    address = WIRE_ID;
+    address = ADDRESS_I2C;
     EEPROM.write(EEPROM_ADDRESS, address);
   }
+#endif
+
   SerialPrint("Wire begin ");
   SerialPrintln(address);
   Wire.begin(address);
