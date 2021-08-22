@@ -27,7 +27,7 @@ void UpdateHostPort(String input)
   int port = doc["port"];
 
   Serial.println("[ ]Update " + String(name) + " " + String(ip) + " " + String(port));
-  SetHostPort(String(host), port);
+  SetHostPort(String(ip), port);
 }
 
 void UpdatePool()
