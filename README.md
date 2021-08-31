@@ -8,7 +8,7 @@ Using the I2C communication to connect all the boards and make a scalable commun
 
 ## Version
 
-DuinoCoinI2C Version 2.*
+DuinoCoinI2C Version 2.7
 
 # Arduino - Slave
 
