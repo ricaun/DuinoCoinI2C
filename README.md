@@ -73,7 +73,7 @@ Check the [ATTinyCore](https://github.com/SpenceKonde/ATTinyCore/) project for m
 I2C Address is selected by the `EEPROM_ADDRESS` (default 0) and the first upload the Address is set by the define.
 
 ```
-#define WIRE_ID 1
+#define ADDRESS_I2C 1
 ```
 
 # Esp8266/Esp32 - Master
