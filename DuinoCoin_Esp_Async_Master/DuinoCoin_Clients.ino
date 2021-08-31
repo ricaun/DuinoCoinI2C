@@ -263,6 +263,16 @@ void clients_sendJobDone(byte i)
     String id = response.readStringUntil('\n');
     float HashRate = job / (time * .000001f);
 
+    if (HashRate > 200) // Force HashRate to slow down
+    {
+      Serial.print("[" + String(i) + "]");
+      Serial.println("Slow down HashRate: " + String(HashRate,2));
+      while(HashRate > 200) 
+      {
+        HashRate -= random(10.0);
+      }
+    }
+
     if (id.length() > 0) id = "," + id;
 
     String identifier = String(rigIdentifier) + "-" + String(i);
