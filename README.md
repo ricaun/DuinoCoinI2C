@@ -1,6 +1,5 @@
 # DuinoCoinI2C
 
-## **DuinoCoinI2C is not working on the DuinoCoin Version 2.7**
 
 This project design to mine [Duino-Coin](https://github.com/revoxhere/duino-coin) using an Esp8266/Esp32 as a master and Arduino as a slave. 
 
