@@ -32,6 +32,18 @@ void SetHostPort(String h, int p)
   port = p;
 }
 
+String SetHost(String h)
+{
+  host = h;
+  return host;
+}
+
+int SetPort(int p)
+{
+  port = p;
+  return port;
+}
+
 // State Machine
 enum Duino_State
 {
@@ -77,8 +89,9 @@ bool clients_connect(byte i)
   Serial.print("[" + String(i) + "]");
   Serial.println("Connecting to Duino-Coin server... with port " + String(port));
 
-  ws_sendAll("[" + String(i) + "]" + "Connecting to Duino-Coin server...");
+  ws_sendAll("[" + String(i) + "]" + "Connecting to Duino-Coin server... " + String(port));
 
+  clients[i].setTimeout(30000);
   if (!clients[i].connect(host.c_str(), port))
   {
     Serial.print("[" + String(i) + "]");
@@ -86,6 +99,8 @@ bool clients_connect(byte i)
     UpdatePool();
     return false;
   }
+  clients[i].setTimeout(100);
+  
   clientsShares[i] = 0;
   clientsBadJob[i] = 0;
   clientsTimes[i] = millis();
@@ -129,7 +144,7 @@ void clients_loop()
     int i = client_i;
     if (wire_exists(i + 1) && clients_connected(i))
     {
-
+      
       switch (clientsWaitJob[i])
       {
         case DUINO_STATE_VERSION_WAIT:
@@ -201,7 +216,7 @@ void clients_requestJob(byte i)
 {
   Serial.print("[" + String(i) + "]");
   Serial.println("Job Request: " + String(ducouser));
-  clients[i].print("JOB," + String(ducouser) + "," + JOB);
+  clients[i].print(JOB + String(ducouser));
   clients_state(i, DUINO_STATE_JOB_WAIT);
 }
 
@@ -252,9 +267,11 @@ void clients_sendJobDone(byte i)
 
     String identifier = String(rigIdentifier) + "-" + String(i);
 
-    clients[i].print(String(job) + "," + String(HashRate, 2) + "," + MINER + "," + String(identifier) + id);
+    clients[i].print(String(job,2) + "," + String(HashRate,2) + "," + MINER + "," + String(identifier) + id);
+    
     Serial.print("[" + String(i) + "]");
-    Serial.println("Job Done: (" + String(job) + ")" + " Hashrate: " + String(HashRate));
+    Serial.println(String(job,2) + "," + String(HashRate,2) + "," + MINER + "," + String(identifier) + id);
+    //Serial.println("Job Done: (" + String(job) + ")" + " Hashrate: " + String(HashRate));
 
     clients_state(i, DUINO_STATE_JOB_DONE_WAIT);
   }
@@ -296,7 +313,7 @@ String clients_string()
 {
   int i = 0;
   String str;
-  str += "I2C Connected";
+  str += "I2C ";
   str += "[";
   str += " ";
   for (i = 0; i < CLIENTS; i++)

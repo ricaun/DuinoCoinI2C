@@ -37,15 +37,14 @@ const char* rigIdentifier = "AVR-I2C";  // Change this if you want a custom mine
 
 #if ESP8266
 #define LED_BUILTIN 2
-#define MINER "AVR I2C v2.6"
-#define JOB "AVR"
-//#define JOB "ESP8266"
+#define MINER "AVR I2C v2.7"
+#define JOB "000ZZ,"
 #endif
 
 #if ESP32
 #define LED_BUILTIN 2
-#define MINER "AVR I2C v2.6"
-#define JOB "AVR"
+#define MINER "AVR I2C v2.7"
+#define JOB "000ZZ,"
 #endif
 
 void handleSystemEvents(void) {
@@ -130,24 +129,30 @@ void setup() {
   Serial.print("\nDuino-Coin");
   Serial.println(MINER);
 
+  oled_setup();
+
   wire_setup();
   SetupWifi();
   SetupOTA();
 
+  oled_display(WiFi.localIP().toString() + "\n" + String(ESP.getFreeHeap()) + "\n" + clients_string());
+
   server_setup();
   
   UpdatePool();
+
   blink(BLINK_SETUP_COMPLETE);
 }
 
 void loop() {
   ArduinoOTA.handle();
   clients_loop();
-  if (runEvery(5000))
+  if (runEvery(1000))
   {
     Serial.print("[ ]");
     Serial.println("FreeRam: " + String(ESP.getFreeHeap()) + " " + clients_string());
     ws_sendAll("FreeRam: " + String(ESP.getFreeHeap()) + " - " + clients_string());
+    oled_display(WiFi.localIP().toString() + "\n" + String(ESP.getFreeHeap()) + "\n" + clients_string());
   }
 }
 

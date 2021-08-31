@@ -17,19 +17,25 @@
 #endif
 
 #define WIRE_CLOCK 100000
+#define WIRE_MAX 32
 
 void wire_setup()
 {
   //pinMode(SDA, INPUT_PULLUP);
   //pinMode(SCL, INPUT_PULLUP);
+  wire_start();
+  wire_readAll();
+}
+
+void wire_start()
+{
   Wire.begin(SDA, SCL);
   Wire.setClock(WIRE_CLOCK);
-  wire_readAll();
 }
 
 void wire_readAll()
 {
-  for (byte address = 1; address < 127; address++ )
+  for (byte address = 1; address < WIRE_MAX; address++ )
   {
     if (wire_exists(address))
     {
@@ -40,8 +46,22 @@ void wire_readAll()
   }
 }
 
+void wire_SendAll(String message)
+{
+  for (byte address = 1; address < WIRE_MAX; address++ )
+  {
+    if (wire_exists(address))
+    {
+      Serial.print("Address: ");
+      Serial.println(address);
+      Wire_sendln(address, message);
+    }
+  }
+}
+
 boolean wire_exists(byte address)
 {
+  wire_start();
   Wire.beginTransmission(address);
   byte error = Wire.endTransmission();
   return (error == 0);
@@ -60,6 +80,7 @@ void Wire_sendln(byte address, String message)
 
 void Wire_send(byte address, String message)
 {
+  wire_start();
   for (int i = 0; i < message.length(); i++)
   {
     Wire.beginTransmission(address);
@@ -74,6 +95,7 @@ String wire_readLine(int address)
   char end = '\n';
   String str = "";
   boolean done = false;
+  wire_start();
   while (!done)
   {
     Wire.requestFrom(address, 1);
