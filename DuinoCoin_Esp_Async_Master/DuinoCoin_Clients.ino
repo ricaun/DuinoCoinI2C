@@ -144,7 +144,7 @@ void clients_loop()
     int i = client_i;
     if (wire_exists(i + 1) && clients_connected(i))
     {
-
+      
       switch (clientsWaitJob[i])
       {
         case DUINO_STATE_VERSION_WAIT:
@@ -216,7 +216,7 @@ void clients_requestJob(byte i)
 {
   Serial.print("[" + String(i) + "]");
   Serial.println("Job Request: " + String(ducouser));
-  clients[i].print("JOB," + String(ducouser) + "," + JOB);
+  clients[i].print(JOB + String(ducouser));
   clients_state(i, DUINO_STATE_JOB_WAIT);
 }
 
@@ -267,9 +267,11 @@ void clients_sendJobDone(byte i)
 
     String identifier = String(rigIdentifier) + "-" + String(i);
 
-    clients[i].print(String(job) + "," + String(HashRate, 2) + "," + MINER + "," + String(identifier) + id);
+    clients[i].print(String(job,2) + "," + String(HashRate,2) + "," + MINER + "," + String(identifier) + id);
+    
     Serial.print("[" + String(i) + "]");
-    Serial.println("Job Done: (" + String(job) + ")" + " Hashrate: " + String(HashRate));
+    Serial.println(String(job,2) + "," + String(HashRate,2) + "," + MINER + "," + String(identifier) + id);
+    //Serial.println("Job Done: (" + String(job) + ")" + " Hashrate: " + String(HashRate));
 
     clients_state(i, DUINO_STATE_JOB_DONE_WAIT);
   }
