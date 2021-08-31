@@ -23,7 +23,7 @@
 #define END_TOKEN  '\n'
 #define SEP_TOKEN  ','
 
-String host = "149.91.88.18";
+String host = "51.158.182.90";
 int port = 6000;
 
 void SetHostPort(String h, int p)
@@ -87,9 +87,9 @@ bool clients_connect(byte i)
   wire_readLine(i);
 
   Serial.print("[" + String(i) + "]");
-  Serial.println("Connecting to Duino-Coin server... with port " + String(port));
+  Serial.println("Connecting to Duino-Coin server... " + String(host) + " " + String(port));
 
-  ws_sendAll("[" + String(i) + "]" + "Connecting to Duino-Coin server... " + String(port));
+  ws_sendAll("[" + String(i) + "]" + "Connecting to Duino-Coin server... " + String(host) + " " + String(port));
 
   clients[i].setTimeout(30000);
   if (!clients[i].connect(host.c_str(), port))

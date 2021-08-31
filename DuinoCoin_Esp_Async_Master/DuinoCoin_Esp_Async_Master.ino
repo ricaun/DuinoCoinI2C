@@ -15,7 +15,7 @@ boolean wire_runEvery(unsigned long interval);
 
 const char* ssid          = "";         // Change this to your WiFi SSID
 const char* password      = "";         // Change this to your WiFi password
-const char* ducouser      = "";         // Change this to your Duino-Coin username
+const char* ducouser      = "ricaun";   // Change this to your Duino-Coin username
 const char* rigIdentifier = "AVR-I2C";  // Change this if you want a custom miner name
 
 #if ESP8266
@@ -126,7 +126,7 @@ void RestartESP(String msg) {
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
-  Serial.print("\nDuino-Coin");
+  Serial.print("\nDuino-Coin ");
   Serial.println(MINER);
 
   oled_setup();
