@@ -23,7 +23,8 @@
 #define END_TOKEN  '\n'
 #define SEP_TOKEN  ','
 
-#define HASHRATE_MAX 195.0
+#define HASHRATE_FORCE true
+#define HASHRATE_SPEED 195.0
 
 String host = "51.158.182.90";
 int port = 6000;
@@ -265,7 +266,7 @@ void clients_sendJobDone(byte i)
     String id = response.readStringUntil('\n');
     float HashRate = job / (time * .000001f);
 
-    if (HashRate > HASHRATE_MAX) // Force HashRate to slow down
+    if (HASHRATE_FORCE) // Force HashRate to slow down
     {
       Serial.print("[" + String(i) + "]");
       Serial.println("Slow down HashRate: " + String(HashRate, 2));
