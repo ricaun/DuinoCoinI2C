@@ -270,7 +270,7 @@ void clients_sendJobDone(byte i)
     {
       Serial.print("[" + String(i) + "]");
       Serial.println("Slow down HashRate: " + String(HashRate, 2));
-      HashRate = HASHRATE_MAX + random(-50, 50) / 100.0;
+      HashRate = HASHRATE_SPEED + random(-50, 50) / 100.0;
     }
 
     if (id.length() > 0) id = "," + id;
