@@ -37,14 +37,14 @@ const char* rigIdentifier = "AVR-I2C";  // Change this if you want a custom mine
 
 #if ESP8266
 #define LED_BUILTIN 2
-#define MINER "AVR I2C v2.7"
-#define JOB "000ZZ,"
+#define MINER "AVR I2C v2.7.3"
+#define JOB "AVR,"
 #endif
 
 #if ESP32
 #define LED_BUILTIN 2
-#define MINER "AVR I2C v2.7"
-#define JOB "000ZZ,"
+#define MINER "AVR I2C v2.7.3"
+#define JOB "AVR"
 #endif
 
 void handleSystemEvents(void) {
