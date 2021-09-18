@@ -23,13 +23,28 @@
 #define END_TOKEN  '\n'
 #define SEP_TOKEN  ','
 
-String host = "149.91.88.18";
+#define HASHRATE_FORCE true
+#define HASHRATE_SPEED 195.0
+
+String host = "51.158.182.90";
 int port = 6000;
 
 void SetHostPort(String h, int p)
 {
   host = h;
   port = p;
+}
+
+String SetHost(String h)
+{
+  host = h;
+  return host;
+}
+
+int SetPort(int p)
+{
+  port = p;
+  return port;
 }
 
 // State Machine
@@ -75,21 +90,25 @@ bool clients_connect(byte i)
   wire_readLine(i);
 
   Serial.print("[" + String(i) + "]");
-  Serial.println("Connecting to Duino-Coin server... with port " + String(port));
+  Serial.println("Connecting to Duino-Coin server... " + String(host) + " " + String(port));
 
-  ws_sendAll("[" + String(i) + "]" + "Connecting to Duino-Coin server...");
+  ws_sendAll("[" + String(i) + "]" + "Connecting to Duino-Coin server... " + String(host) + " " + String(port));
 
+  clients[i].setTimeout(30000);
   if (!clients[i].connect(host.c_str(), port))
   {
     Serial.print("[" + String(i) + "]");
     Serial.println("Connection failed.");
+    UpdatePool();
     return false;
   }
+  clients[i].setTimeout(100);
+
   clientsShares[i] = 0;
   clientsBadJob[i] = 0;
   clientsTimes[i] = millis();
   clientsBuffer[i] = "";
-  clients_state(i, DUINO_STATE_VERSION_WAIT); 
+  clients_state(i, DUINO_STATE_VERSION_WAIT);
   return true;
 }
 
@@ -101,7 +120,7 @@ void clients_state(byte i, byte state)
 
 bool clients_stop(byte i)
 {
-  clients_state(i, DUINO_STATE_NONE); 
+  clients_state(i, DUINO_STATE_NONE);
   clients[i].stop();
   return true;
 }
@@ -129,6 +148,7 @@ void clients_loop()
     if (wire_exists(i + 1) && clients_connected(i))
     {
 
+      for(int j = 0; j < 3; j++ )
       switch (clientsWaitJob[i])
       {
         case DUINO_STATE_VERSION_WAIT:
@@ -191,7 +211,7 @@ void clients_waitRequestVersion(byte i)
     String buffer = clients[i].readStringUntil(END_TOKEN);
     Serial.println("[" + String(i) + "]" + buffer);
     clients_state(i, DUINO_STATE_JOB_REQUEST);
-    if (clientsMOTD) clients_state(i, DUINO_STATE_MOTD_REQUEST); 
+    if (clientsMOTD) clients_state(i, DUINO_STATE_MOTD_REQUEST);
     clientsMOTD = false;
   }
 }
@@ -247,13 +267,22 @@ void clients_sendJobDone(byte i)
     String id = response.readStringUntil('\n');
     float HashRate = job / (time * .000001f);
 
+    if (HASHRATE_FORCE) // Force HashRate to slow down
+    {
+      Serial.print("[" + String(i) + "]");
+      Serial.println("Slow down HashRate: " + String(HashRate, 2));
+      HashRate = HASHRATE_SPEED + random(-50, 50) / 100.0;
+    }
+
     if (id.length() > 0) id = "," + id;
 
     String identifier = String(rigIdentifier) + "-" + String(i);
 
     clients[i].print(String(job) + "," + String(HashRate, 2) + "," + MINER + "," + String(identifier) + id);
+
     Serial.print("[" + String(i) + "]");
-    Serial.println("Job Done: (" + String(job) + ")" + " Hashrate: " + String(HashRate));
+    Serial.println(String(job) + "," + String(HashRate, 2) + "," + MINER + "," + String(identifier) + id);
+    //Serial.println("Job Done: (" + String(job) + ")" + " Hashrate: " + String(HashRate));
 
     clients_state(i, DUINO_STATE_JOB_DONE_WAIT);
   }
@@ -295,7 +324,7 @@ String clients_string()
 {
   int i = 0;
   String str;
-  str += "I2C Connected";
+  str += "I2C ";
   str += "[";
   str += " ";
   for (i = 0; i < CLIENTS; i++)

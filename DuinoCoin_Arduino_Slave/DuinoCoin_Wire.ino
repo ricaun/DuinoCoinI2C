@@ -20,7 +20,7 @@ void DuinoCoin_setup()
   pinMode(A5, INPUT_PULLUP);
   pinMode(A4, INPUT_PULLUP);
   
-  unsigned long time = getTrueRotateRandomByte() * 1000 + getTrueRotateRandomByte();
+  unsigned long time = (unsigned long) getTrueRotateRandomByte() * 1000 + (unsigned long) getTrueRotateRandomByte();
   delayMicroseconds(time);
   Wire.begin();
   for (int address = 1; address < 127; address++ )
@@ -58,7 +58,8 @@ void receiveEvent(int howMany) {
 
 void requestEvent() {
   char c = '\n';
-  if (bufferRequest.length() > 0)
+  if (bufferRequest.available() > 0 && bufferRequest.indexOf('\n') != -1)
+  //if (bufferRequest.length() > 0)
   {
     c = bufferRequest.read();
   }
@@ -68,6 +69,10 @@ void requestEvent() {
 bool DuinoCoin_loop()
 {
   if (bufferReceive.available() > 0 && bufferReceive.indexOf('\n') != -1) {
+
+    Serial.print(F("Job: "));
+    Serial.print(bufferReceive);
+
     // Read last block hash
     String lastblockhash = bufferReceive.readStringUntil(',');
     // Read expected hash
@@ -86,6 +91,10 @@ bool DuinoCoin_loop()
     // Send result back to the program with share time
     while (bufferRequest.available()) bufferRequest.read();
     bufferRequest.print(String(ducos1result) + "," + String(elapsedTime) + "," + String(get_DUCOID()) + "\n");
+    
+    Serial.print(F("Done "));
+    Serial.print(String(ducos1result) + "," + String(elapsedTime) + "," + String(get_DUCOID()) + "\n");
+
     return true;
   }
   return false;

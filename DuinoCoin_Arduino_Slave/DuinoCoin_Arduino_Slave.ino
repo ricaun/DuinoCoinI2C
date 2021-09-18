@@ -1,5 +1,5 @@
 /*
-  DoinoCoin_ArduinoSlave.ino
+  DoinoCoin_Arduino_Slave.ino
   created 10 05 2021
   by Luiz H. Cassettari
 */
@@ -14,8 +14,6 @@ void setup() {
 void loop() {
   if (DuinoCoin_loop())
   {
-    Serial.print(F("Job Done : "));
-    Serial.print(DuinoCoin_response());
     Blink();
   }
 }

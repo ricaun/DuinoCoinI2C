@@ -15,7 +15,7 @@ boolean wire_runEvery(unsigned long interval);
 
 const char* ssid          = "";         // Change this to your WiFi SSID
 const char* password      = "";         // Change this to your WiFi password
-const char* ducouser      = "";         // Change this to your Duino-Coin username
+const char* ducouser      = "ricaun";   // Change this to your Duino-Coin username
 const char* rigIdentifier = "AVR-I2C";  // Change this if you want a custom miner name
 
 #if ESP8266
@@ -37,14 +37,13 @@ const char* rigIdentifier = "AVR-I2C";  // Change this if you want a custom mine
 
 #if ESP8266
 #define LED_BUILTIN 2
-#define MINER "AVR I2C v2.6"
-#define JOB "AVR"
-//#define JOB "ESP8266"
+#define MINER "AVR I2C v2.7.3"
+#define JOB "AVR,"
 #endif
 
 #if ESP32
 #define LED_BUILTIN 2
-#define MINER "AVR I2C v2.6"
+#define MINER "AVR I2C v2.7.3"
 #define JOB "AVR"
 #endif
 
@@ -127,27 +126,33 @@ void RestartESP(String msg) {
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
-  Serial.print("\nDuino-Coin");
+  Serial.print("\nDuino-Coin ");
   Serial.println(MINER);
+
+  oled_setup();
 
   wire_setup();
   SetupWifi();
   SetupOTA();
 
+  oled_display(WiFi.localIP().toString() + "\n" + String(ESP.getFreeHeap()) + "\n" + clients_string());
+
   server_setup();
   
   UpdatePool();
+
   blink(BLINK_SETUP_COMPLETE);
 }
 
 void loop() {
   ArduinoOTA.handle();
   clients_loop();
-  if (runEvery(5000))
+  if (runEvery(1000))
   {
     Serial.print("[ ]");
     Serial.println("FreeRam: " + String(ESP.getFreeHeap()) + " " + clients_string());
     ws_sendAll("FreeRam: " + String(ESP.getFreeHeap()) + " - " + clients_string());
+    oled_display(WiFi.localIP().toString() + "\n" + String(ESP.getFreeHeap()) + "\n" + clients_string());
   }
 }
 
