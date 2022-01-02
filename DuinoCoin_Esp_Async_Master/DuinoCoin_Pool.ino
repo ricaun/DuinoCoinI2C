@@ -6,7 +6,7 @@
 
 #if ESP8266
 #include <ESP8266HTTPClient.h>
-#include <WiFiClient.h>
+#include <WiFiClientSecure.h>
 #endif
 #if ESP32
 #include <HTTPClient.h>
@@ -14,7 +14,7 @@
 
 #include <ArduinoJson.h>
 
-const char * urlPool = "http://51.15.127.80:4242/getPool";
+const char * urlPool = "https://server.duinocoin.com/getPool";
 
 void UpdateHostPort(String input)
 {
@@ -40,7 +40,8 @@ void UpdatePool()
 String httpGetString(String URL)
 {
   String payload = "";
-  WiFiClient client;
+  WiFiClientSecure client;
+  client.setInsecure();
   HTTPClient http;
   if (http.begin(client, URL))
   {
