@@ -6,7 +6,7 @@
 
 #if ESP8266
 #include <ESP8266HTTPClient.h>
-#include <WiFiClientSecure.h>
+#include <WiFiClient.h>
 #endif
 #if ESP32
 #include <HTTPClient.h>
