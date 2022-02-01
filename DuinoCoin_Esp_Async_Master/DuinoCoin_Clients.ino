@@ -220,7 +220,7 @@ void clients_requestJob(byte i)
 {
   Serial.print("[" + String(i) + "]");
   Serial.println("Job Request: " + String(ducouser));
-  clients[i].print("JOB" + SEP_TOKEN + String(ducouser) + SEP_TOKEN + JOB);
+  clients[i].print("JOB," + String(ducouser) + "," + JOB);
   clients_state(i, DUINO_STATE_JOB_WAIT);
 }
 
@@ -234,7 +234,7 @@ void clients_waitRequestJob(byte i)
     Serial.println(clientBuffer);
 
     // Not a Valid Job -> Request Again
-    if (clientBuffer.indexOf(',') == -1)
+    if (clientBuffer.indexOf(SEP_TOKEN) == -1)
     {
       clients_stop(i);
       return;
@@ -262,9 +262,9 @@ void clients_sendJobDone(byte i)
     StreamString response;
     response.print(responseJob);
 
-    int job = response.readStringUntil(',').toInt();
-    int time = response.readStringUntil(',').toInt();
-    String id = response.readStringUntil('\n');
+    int job = response.readStringUntil(SEP_TOKEN).toInt();
+    int time = response.readStringUntil(SEP_TOKEN).toInt();
+    String id = response.readStringUntil(END_TOKEN);
     float HashRate = job / (time * .000001f);
 
     if (HASHRATE_FORCE) // Force HashRate
