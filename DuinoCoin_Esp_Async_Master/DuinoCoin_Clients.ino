@@ -23,10 +23,10 @@
 #define END_TOKEN  '\n'
 #define SEP_TOKEN  ','
 
-#define HASHRATE_FORCE true
-#define HASHRATE_SPEED 195.0
+#define HASHRATE_FORCE false
+#define HASHRATE_SPEED 258.0
 
-String host = "51.158.182.90";
+String host = "";
 int port = 6000;
 
 void SetHostPort(String h, int p)
@@ -234,7 +234,7 @@ void clients_waitRequestJob(byte i)
     Serial.println(clientBuffer);
 
     // Not a Valid Job -> Request Again
-    if (clientBuffer.indexOf(',') == -1)
+    if (clientBuffer.indexOf(SEP_TOKEN) == -1)
     {
       clients_stop(i);
       return;
@@ -262,27 +262,26 @@ void clients_sendJobDone(byte i)
     StreamString response;
     response.print(responseJob);
 
-    int job = response.readStringUntil(',').toInt();
-    int time = response.readStringUntil(',').toInt();
-    String id = response.readStringUntil('\n');
+    int job = response.readStringUntil(SEP_TOKEN).toInt();
+    int time = response.readStringUntil(SEP_TOKEN).toInt();
+    String id = response.readStringUntil(END_TOKEN);
     float HashRate = job / (time * .000001f);
 
-    if (HASHRATE_FORCE) // Force HashRate to slow down
+    if (HASHRATE_FORCE) // Force HashRate
     {
       Serial.print("[" + String(i) + "]");
-      Serial.println("Slow down HashRate: " + String(HashRate, 2));
+      Serial.println("Force HashRate: " + String(HashRate, 2));
       HashRate = HASHRATE_SPEED + random(-50, 50) / 100.0;
     }
 
-    if (id.length() > 0) id = "," + id;
+    if (id.length() > 0) id = SEP_TOKEN + id;
 
-    String identifier = String(rigIdentifier) + "-" + String(i);
+    String identifier = String(rigIdentifier) + " " + "[" +String(i) + "]";
 
-    clients[i].print(String(job) + "," + String(HashRate, 2) + "," + MINER + "," + String(identifier) + id);
+    clients[i].print(String(job) + SEP_TOKEN + String(HashRate, 2) + SEP_TOKEN + MINER + SEP_TOKEN + String(identifier) + id);
 
     Serial.print("[" + String(i) + "]");
-    Serial.println(String(job) + "," + String(HashRate, 2) + "," + MINER + "," + String(identifier) + id);
-    //Serial.println("Job Done: (" + String(job) + ")" + " Hashrate: " + String(HashRate));
+    Serial.println(String(job) + SEP_TOKEN + String(HashRate, 2) + SEP_TOKEN+ MINER + SEP_TOKEN + String(identifier) + id);
 
     clients_state(i, DUINO_STATE_JOB_DONE_WAIT);
   }
@@ -303,7 +302,7 @@ void clients_waitFeedbackJobDone(byte i)
 
     clients_state(i, DUINO_STATE_JOB_REQUEST);
 
-    if (clientBuffer == "BAD")
+    if (clientBuffer.indexOf("BAD") != -1)
     {
       if (clientsBadJob[i]++ > 3)
       {
