@@ -15,8 +15,8 @@ boolean wire_runEvery(unsigned long interval);
 
 const char* ssid          = "";         // Change this to your WiFi SSID
 const char* password      = "";         // Change this to your WiFi password
-const char* ducouser      = "ricaun";   // Change this to your Duino-Coin username
-const char* rigIdentifier = "AVR-I2C";  // Change this if you want a custom miner name
+const char* ducouser      = "ricaun";        // Change this to your Duino-Coin username
+const char* rigIdentifier = "AVR I²C v3.0";  // Change this if you want a custom miner name
 
 #if ESP8266
 #include <ESP8266WiFi.h> // Include WiFi library
@@ -37,13 +37,13 @@ const char* rigIdentifier = "AVR-I2C";  // Change this if you want a custom mine
 
 #if ESP8266
 #define LED_BUILTIN 2
-#define MINER "AVR I2C v3.0"
+#define MINER "AVR I²C v3.0"
 #define JOB "AVR"
 #endif
 
 #if ESP32
 #define LED_BUILTIN 2
-#define MINER "AVR I2C v3.0"
+#define MINER "AVR I²C v3.0"
 #define JOB "AVR"
 #endif
 

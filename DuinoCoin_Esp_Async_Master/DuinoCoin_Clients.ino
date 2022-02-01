@@ -276,13 +276,12 @@ void clients_sendJobDone(byte i)
 
     if (id.length() > 0) id = "," + id;
 
-    String identifier = String(rigIdentifier) + "-" + String(i);
+    String identifier = String(rigIdentifier) + " " + String(i);
 
     clients[i].print(String(job) + "," + String(HashRate, 2) + "," + MINER + "," + String(identifier) + id);
 
     Serial.print("[" + String(i) + "]");
     Serial.println(String(job) + "," + String(HashRate, 2) + "," + MINER + "," + String(identifier) + id);
-    //Serial.println("Job Done: (" + String(job) + ")" + " Hashrate: " + String(HashRate));
 
     clients_state(i, DUINO_STATE_JOB_DONE_WAIT);
   }
