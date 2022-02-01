@@ -23,8 +23,8 @@
 #define END_TOKEN  '\n'
 #define SEP_TOKEN  ','
 
-#define HASHRATE_FORCE true
-#define HASHRATE_SPEED 195.0
+#define HASHRATE_FORCE false
+#define HASHRATE_SPEED 258.0
 
 String host = "51.158.182.90";
 int port = 6000;
@@ -267,10 +267,10 @@ void clients_sendJobDone(byte i)
     String id = response.readStringUntil('\n');
     float HashRate = job / (time * .000001f);
 
-    if (HASHRATE_FORCE) // Force HashRate to slow down
+    if (HASHRATE_FORCE) // Force HashRate
     {
       Serial.print("[" + String(i) + "]");
-      Serial.println("Slow down HashRate: " + String(HashRate, 2));
+      Serial.println("Force HashRate: " + String(HashRate, 2));
       HashRate = HASHRATE_SPEED + random(-50, 50) / 100.0;
     }
 
@@ -303,7 +303,7 @@ void clients_waitFeedbackJobDone(byte i)
 
     clients_state(i, DUINO_STATE_JOB_REQUEST);
 
-    if (clientBuffer == "BAD")
+    if (clientBuffer.indexOf("BAD") != -1)
     {
       if (clientsBadJob[i]++ > 3)
       {
