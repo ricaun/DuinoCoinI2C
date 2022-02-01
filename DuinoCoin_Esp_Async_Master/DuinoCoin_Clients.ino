@@ -220,7 +220,7 @@ void clients_requestJob(byte i)
 {
   Serial.print("[" + String(i) + "]");
   Serial.println("Job Request: " + String(ducouser));
-  clients[i].print("JOB," + String(ducouser) + "," + JOB);
+  clients[i].print("JOB" + SEP_TOKEN + String(ducouser) + SEP_TOKEN + JOB);
   clients_state(i, DUINO_STATE_JOB_WAIT);
 }
 
@@ -274,14 +274,14 @@ void clients_sendJobDone(byte i)
       HashRate = HASHRATE_SPEED + random(-50, 50) / 100.0;
     }
 
-    if (id.length() > 0) id = "," + id;
+    if (id.length() > 0) id = SEP_TOKEN + id;
 
-    String identifier = String(rigIdentifier) + " " + String(i);
+    String identifier = String(rigIdentifier) + " " + "[" +String(i) + "]";
 
-    clients[i].print(String(job) + "," + String(HashRate, 2) + "," + MINER + "," + String(identifier) + id);
+    clients[i].print(String(job) + SEP_TOKEN + String(HashRate, 2) + SEP_TOKEN + MINER + SEP_TOKEN + String(identifier) + id);
 
     Serial.print("[" + String(i) + "]");
-    Serial.println(String(job) + "," + String(HashRate, 2) + "," + MINER + "," + String(identifier) + id);
+    Serial.println(String(job) + SEP_TOKEN + String(HashRate, 2) + SEP_TOKEN+ MINER + SEP_TOKEN + String(identifier) + id);
 
     clients_state(i, DUINO_STATE_JOB_DONE_WAIT);
   }
